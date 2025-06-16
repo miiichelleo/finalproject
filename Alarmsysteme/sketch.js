@@ -54,11 +54,11 @@ function draw() {
 
   let waveform = fft.waveform();
 
-  let baseRadius = 81;  // Radius of base circle
+  let baseRadius = 83;  // Radius of base circle
   let cx = width / 2;
   let cy = height / 2;
 
-  fill(0, 1.7);
+  fill(0, 1.0);
   
   for (let i = 0; i < waveform.length; i += 1) {
     let angle = map(i, 0, waveform.length, 0, TWO_PI);
@@ -68,7 +68,7 @@ function draw() {
     let x = cx + cos(angle) * radius;
     let y = cy + sin(angle) * radius;
   
-    let size = map(abs(waveVal), 0, 1, 10, 100);
+    let size = map(abs(waveVal), 0, 1, 11, 150);
     ellipse(x, y, size);
   }
   
