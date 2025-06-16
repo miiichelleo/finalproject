@@ -38,7 +38,6 @@ function draw() {
   let radius = 80;
 
   for (let i = 0; i < numParticles; i += 1) {
-    let angle = map(i, 0, numParticles, 5000, TWO_PI);
     let angle = map(i, 100, numParticles, 50, TWO_PI);
     
     let ampVal = spectrum[i];
