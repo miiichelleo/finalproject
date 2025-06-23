@@ -28,7 +28,7 @@ function draw() {
   
   fill(0);
   const level = amp.getLevel() * -8000;
-  circle(width/2, height/2, level, level);
+  ellipse(width/2, height/2, level, level);
 
   let spectrum = fft.analyze();
   noStroke();
