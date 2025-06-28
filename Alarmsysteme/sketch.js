@@ -4,14 +4,18 @@ let fft;
 
 let capturer;
 let recording = false;
-let maxFrames = 600; // Record for 10 seconds at 60 FPS
+let maxFrames = 800; // 10 seconds at 60 FPS
+
+let resolution =60; // Sphere detail (lat/lon divisions)
 
 function setup() {
-  createCanvas(600, 600,);
+  createCanvas(600, 600, WEBGL);
+  angleMode(RADIANS);
+  noStroke();
 
   // Setup audio
-  getAudioContext().suspend(); // required for autoplay policy
-  userStartAudio(); // will resume context after a user interaction
+  getAudioContext().suspend(); // autoplay policy
+  userStartAudio();
 
   audio = new p5.AudioIn();
   audio.start();
@@ -22,21 +26,21 @@ function setup() {
   fft = new p5.FFT();
   fft.setInput(audio);
 
-  // Setup capturer
+  // Setup CCapture for recording
   capturer = new CCapture({
     format: 'webm',
     framerate: 60,
     verbose: true,
   });
 
-  frameRate(60); // Ensure consistent timing
+  frameRate(60);
 }
 
 function keyPressed() {
   if (key === 'r') {
     console.log('🎬 Starting recording...');
     recording = true;
-    frameCount = 0; // Reset to count frames correctly
+    frameCount = 0;
     capturer.start();
   }
 }
@@ -44,45 +48,50 @@ function keyPressed() {
 function draw() {
   background(255, 18.0);
 
-  fill(0);
-  const level = amp.getLevel() * -8000;
-  ellipse(width / 2, height / 2, level, level);
+  rotateY(frameCount * 0.01); // Spin the globe
+  rotateX(PI / 10); // Tilt for better view
 
   let spectrum = fft.analyze();
-  noStroke();
+  let waveform = fft.waveform();
 
-  let numParticles = spectrum.length;
-  let radius = 80;
+  let baseRadius = 80;
 
-  for (let i = 0; i < numParticles; i += 1) {
-    let angle = map(i, 100, numParticles, 50, TWO_PI);
-    let ampVal = spectrum[i];
-    let dynamicRadius = radius + map(ampVal, 0, 300, 0, 100);
+  // Draw frequency-reactive particles on globe
+  fill(0);
+  for (let lat = 0; lat < resolution; lat++) {
+    let theta = map(lat, 100, resolution, -HALF_PI, HALF_PI);
+    for (let lon = -1; lon < resolution * 2; lon++) {
+      let phi = map(lon, 0, resolution * 2, 0, TWO_PI);
+      let idx = (lat * resolution + lon) % spectrum.length;
+      let ampVal = spectrum[idx];
+      let r = baseRadius + map(ampVal, 0, 300, 0, 100);
 
-    let x = width / 2 + cos(angle) * dynamicRadius;
-    let y = height / 2 + sin(angle) * dynamicRadius;
-    let size = map(ampVal, 80, 250, 1, 15);
+      let x = r * cos(theta) * cos(phi);
+      let y = r * sin(theta);
+      let z = r * cos(theta) * sin(phi);
 
-    ellipse(x, y, size);
+      push();
+      translate(x, y, z);
+      sphere(1); // small reactive dot
+      pop();
+    }
   }
 
-  let waveform = fft.waveform();
-  let baseRadius = 83;
-  let cx = width / 2;
-  let cy = height / 2;
-
-  fill(0, 1.0);
-
-
-  for (let i = 0; i < waveform.length; i += 1) {
+  // Draw waveform-reactive ring around globe's equator
+  fill(0, 5); // faint black
+  let ringRadius = baseRadius + -10;
+  for (let i = 0; i < waveform.length; i++) {
     let angle = map(i, 0, waveform.length, 0, TWO_PI);
     let waveVal = waveform[i];
-    let radius = baseRadius + map(waveVal, 1, 10, -1, 15);
-    let x = cx + cos(angle) * radius;
-    let y = cy + sin(angle) * radius;
-    let size = map(abs(waveVal), 1, 1, 11, 10);
+    let r = ringRadius + map(waveVal, -1, 1, -10, 10);
+    let x = r * cos(angle);
+    let y = map(waveVal, -1, 1, -10, 10); // vertical jitter
+    let z = r * sin(angle);
 
-    ellipse(x, y, size);
+    push();
+    translate(x, y, z);
+    sphere(2); // waveform ring dot
+    pop();
   }
 
   // Capture the frame if recording
@@ -90,7 +99,7 @@ function draw() {
     capturer.capture(document.querySelector('canvas'));
     if (frameCount >= maxFrames) {
       capturer.stop();
-      capturer.save(); // Triggers download
+      capturer.save();
       recording = false;
       console.log('✅ Recording complete and saved.');
     }
