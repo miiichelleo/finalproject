@@ -77,7 +77,7 @@ function draw() {
 
       push();
       translate(x, y, z);
-      sphere(0.8); // small reactive dot
+      sphere(0.9); // small reactive dot
       pop();
     }
   }
