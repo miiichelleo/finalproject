@@ -2,51 +2,56 @@ let audio;
 let amp;
 let fft;
 
+
 let capturer;
 let recording = false;
-let maxFrames = 100; // 10 seconds at 60 FPS
+let maxFrames = 60; // 10 seconds at 60 FPS
 
-let resolution =80; // Sphere detail (lat/lon divisions)
+let resolution =70; // Sphere detail (lat/lon divisions)
+function preload() {
+  audio = loadSound('Warnung1.mp3');
+}
 
 function setup() {
-  createCanvas(600, 600, WEBGL);
+  const canvas = createCanvas(800, 800, WEBGL);
+  canvas.id('p5canvas'); 
+  const plane = document.querySelector('#p5-plane');
+  if (plane) {
+  plane.setAttribute('material', 'shader: flat; src: #p5canvas; transparent: true');
+}
+  
   angleMode(RADIANS);
   noStroke();
+  
 
-  // Setup audio
-  getAudioContext().suspend(); // autoplay policy
-  userStartAudio();
-
-  audio = new p5.AudioIn();
-  audio.start();
-
-  amp = new p5.Amplitude();
-  amp.setInput(audio);
 
   fft = new p5.FFT();
   fft.setInput(audio);
 
-  // Setup CCapture for recording
-  capturer = new CCapture({
-    format: 'webm',
-    framerate: 50,
-    verbose: true,
-  });
-
+  audio.loop();
   frameRate(60);
 }
 
-function keyPressed() {
-  if (key === 'r') {
-    console.log('🎬 Starting recording...');
-    recording = true;
-    frameCount = 0;
-    capturer.start();
+
+function draw() {
+  
+  // Make sure to update the texture in A-Frame every frame
+const canvas = document.getElementById('p5canvas');
+if (canvas) {
+  // Get the A-Frame plane material and mark texture for update
+  const plane = document.querySelector('#p5-plane');
+  if (plane && plane.object3D && plane.object3D.children.length > 0) {
+    const mesh = plane.object3D.children[0];
+    if (mesh.material.map) {
+      mesh.material.map.needsUpdate = true;
+    }
   }
 }
 
-function draw() {
-  background(255, 10);
+
+  fill(255, 10);
+  // background(255, 0.5);
+  rect(-width/2, -height/2, width, height);
 
   rotateY(frameCount * 0.01); // Spin the globe
   rotateX(PI / 10); // Tilt for better view
@@ -54,7 +59,7 @@ function draw() {
   let spectrum = fft.analyze();
   let waveform = fft.waveform();
 
-  let baseRadius = 80;
+  let baseRadius = 180;
 
   // Draw frequency-reactive particles on globe
   fill(0);
@@ -66,47 +71,22 @@ function draw() {
       let ampVal = spectrum[idx];
 
       let droop = map(ampVal, 0, 1000, 10, 80);
-
       let r = baseRadius + map(ampVal, 10, 340, 10, 200);
       let x = r * cos(theta) * cos(phi);
       let y = r * sin(theta) + droop;
       let z = r * cos(theta) * sin(phi);
 
       let alpha = map(droop, 0, 80, 255, 100);
-      fill(0, alpha);
+      fill(139, 0, 0, alpha);
 
       push();
       translate(x, y, z);
-      sphere(0.9); // small reactive dot
+      sphere(1.3); // small reactive dot
       pop();
     }
   }
 
-  // Draw waveform-reactive ring around globe's equator
-  fill(0, 20); // faint black
-  let ringRadius = baseRadius + -10;
-  for (let i = 0; i < waveform.length; i++) {
-    let angle = map(i, 0, waveform.length, 0, TWO_PI);
-    let waveVal = waveform[i];
-    let r = ringRadius + map(waveVal, -1, 1, -10, 10);
-    let x = r * cos(angle);
-    let y = map(waveVal, -1, 1, -10, 10); // vertical jitter
-    let z = r * sin(angle);
 
-    push();
-    translate(x, y, z);
-    sphere(10); // waveform ring dot
-    pop();
-  }
 
-  // Capture the frame if recording
-  if (recording) {
-    capturer.capture(document.querySelector('canvas'));
-    if (frameCount >= maxFrames) {
-      capturer.stop();
-      capturer.save();
-      recording = false;
-      console.log('✅ Recording complete and saved.');
-    }
-  }
+
 }

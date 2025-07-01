@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sketch1</title>
     <link rel="stylesheet" type="text/css" href="/libraries/p5js/p5.css">
-    <script src="../libraries/aframe-v1.2.0.min.js"></script>
-    <script src="../libraries/aframe-ar.js"></script>
+    <script src="/libraries/arjs/aframe-v1.2.0.min.js"></script>
+    <script src="/libraries/arjs/aframe-ar.js"></script>
     <script src="/libraries/p5js/p5.min.js"></script>
     <script src="/libraries/p5js/libraries/p5.svg.js"></script>
     <script src="/libraries/p5js/libraries/p5.sound.min.js"></script>
@@ -15,9 +15,23 @@
     <script src="https://cdn.jsdelivr.net/npm/ccapture.js@1.1.0/build/CCapture.all.min.js"></script>
 
 </head>
-<body>
-  <a-scene embedded arjs>
-    <a-assets id="assets-container"></a-assets>
+<body style='margin : 0px; overflow: hidden;'>
+  <!-- we add detectionMode and matrixCodeType to tell AR.js to recognize barcode markers -->
+  <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'>
+
+    <a-marker type="pattern" url="patterntest.patt">
+      <a-plane
+        id="p5-plane"
+        position="0 0 0"
+        rotation="-90 0 0"
+        width="2"
+        height="2"
+        material="shader: flat; src: #p5canvas; transparent: true">
+      </a-plane>
+    </a-marker>
+  
+    <a-entity camera></a-entity>
   </a-scene>
+  
 </body>
 </html>
