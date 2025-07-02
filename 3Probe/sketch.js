@@ -9,7 +9,7 @@ let maxFrames = 60; // 10 seconds at 60 FPS
 
 let resolution =70; // Sphere detail (lat/lon divisions)
 function preload() {
-  audio = loadSound('Warnung1.mp3');
+  audio = loadSound('Probe.mp3');
 }
 
 function setup() {
@@ -59,7 +59,7 @@ if (canvas) {
   let spectrum = fft.analyze();
   let waveform = fft.waveform();
 
-  let baseRadius = 180;
+  let baseRadius = 200;
 
   // Draw frequency-reactive particles on globe
   fill(0);
@@ -70,18 +70,19 @@ if (canvas) {
       let idx = (lat * resolution + lon) % spectrum.length;
       let ampVal = spectrum[idx];
 
+      
       let droop = map(ampVal, 0, 1000, 10, 80);
-      let r = baseRadius + map(ampVal, 10, 340, 10, 200);
+      let r = baseRadius + map(ampVal, 10, 340, 10, 350);
       let x = r * cos(theta) * cos(phi);
       let y = r * sin(theta) + droop;
       let z = r * cos(theta) * sin(phi);
 
-      let alpha = map(droop, 0, 80, 255, 100);
-      fill(139, 0, 0, alpha);
+      let alpha = map(droop, 0, 80, 255, 200);
+      fill(255);
 
       push();
       translate(x, y, z);
-      sphere(1.3); // small reactive dot
+      sphere(1.2); // small reactive dot
       pop();
     }
   }
