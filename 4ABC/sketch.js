@@ -53,15 +53,15 @@ if (canvas) {
   // background(255, 0.5);
   rect(-width/2, -height/2, width, height);
 
-  rotateY(frameCount * 0.01); // Spin the globe
-  rotateX(PI / 10); // Tilt for better view
+  rotateY(frameCount * 0.01); // Spin
+  rotateX(PI / 10);
 
   let spectrum = fft.analyze();
   let waveform = fft.waveform();
 
   let baseRadius = 200;
 
-  // Draw frequency-reactive particles on globe
+  // Draw frequency-reactive particles
   fill(0);
   for (let lat = 1; lat < resolution; lat++) {
     let theta = map(lat, 0, resolution, -HALF_PI, HALF_PI);

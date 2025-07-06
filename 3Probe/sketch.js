@@ -13,7 +13,7 @@ function preload() {
 }
 
 function setup() {
-  const canvas = createCanvas(800, 800, WEBGL);
+  const canvas = createCanvas(950, 950, WEBGL);
   canvas.id('p5canvas'); 
   const plane = document.querySelector('#p5-plane');
   if (plane) {

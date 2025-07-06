@@ -44,17 +44,17 @@ function keyPressed() {
 }
 
 function draw() {
-  background(255, 18.0);
+  background(255, 20);
 
   fill(0);
-  const level = amp.getLevel() * -8000;
+  const level = amp.getLevel() * -800;
   ellipse(width / 2, height / 2, level, level);
 
   let spectrum = fft.analyze();
   noStroke();
 
   let numParticles = spectrum.length;
-  let radius = 80;
+  let radius = 150;
 
   for (let i = 0; i < numParticles; i += 1) {
     let angle = map(i, 100, numParticles, 50, TWO_PI);
