@@ -9,7 +9,7 @@ let maxFrames = 60; // 10 seconds at 60 FPS
 
 let resolution =70; // Sphere detail (lat/lon divisions)
 function preload() {
-  audio = loadSound('Probe.mp3');
+  audio = loadSound('probe.mp3');
 }
 
 function setup() {
